@@ -67,7 +67,6 @@ function reloadApplication (serverCode, config, options) {
 //app will try to create server again - intercept EADDRINUSE error and ignore it, otherwise rethrow
 function ignoreServerRecreated (options) {
   process.on('uncaughtException', function (e) {
-    console.log(e.code,e.address,e.port,options.port);
     var test0 = e.code !== 'EADDRINUSE';
     var test1 = e.syscall !== 'listen';
     var test2 = e.address != '127.0.0.1';
