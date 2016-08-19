@@ -5,7 +5,7 @@ var hot = require('webpack-hot-middleware')
 var gutil = require('gulp-util')
 
 function createAndStartDevServer (getApp, options) {
-  const server = http.createServer(function (req, res, next) {
+  var server = http.createServer(function (req, res, next) {
     getApp()(req, res, next)
   })
   server.listen(options.port, options.host, function () {
@@ -16,7 +16,11 @@ function createAndStartDevServer (getApp, options) {
 }
 
 function createWebpackCompiler (config) {
-  config.entry['webpack_hm_client'] = 'webpack-hot-middleware/client?path=' + config.output.publicPath + '__webpack_hmr';
+  if (config.entry instanceof Object){
+    for(key in config.entry){
+      config.entry[key] = ['webpack-hot-middleware/client?path=' + config.output.publicPath + '__webpack_hmr'].concat(config.entry[key]);
+    }
+  }
   if (typeof config.plugins === 'undefined') config.plugins = []
   config.plugins.unshift(new webpack.HotModuleReplacementPlugin());
   return webpack(config)
@@ -63,7 +67,13 @@ function reloadApplication (serverCode, config, options) {
 //app will try to create server again - intercept EADDRINUSE error and ignore it, otherwise rethrow
 function ignoreServerRecreated (options) {
   process.on('uncaughtException', function (e) {
-    if (e.code !== 'EADDRINUSE' || e.syscall !== 'listen' || e.address != '127.0.0.1' || e.port !== options.port) {
+    console.log(e.code,e.address,e.port,options.port);
+    var test0 = e.code !== 'EADDRINUSE';
+    var test1 = e.syscall !== 'listen';
+    var test2 = e.address != '127.0.0.1';
+    var test3 = e.port !== e.port;
+    var bool = test0 || test1 || test2 || test3;
+    if (bool) {
       gutil.log('[gulp-reload]', e)
       throw e
     }
@@ -75,3 +85,4 @@ exports.reloadApplication = reloadApplication
 exports.createWebpackCompiler = createWebpackCompiler
 exports.enableHotReload = enableHotReload
 exports.ignoreServerRecreated = ignoreServerRecreated
+
