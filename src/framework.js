@@ -5,7 +5,7 @@ var hot = require('webpack-hot-middleware')
 var gutil = require('gulp-util')
 
 function createAndStartDevServer (getApp, options) {
-  const server = http.createServer(function (req, res, next) {
+  var server = http.createServer(function (req, res, next) {
     getApp()(req, res, next)
   })
   server.listen(options.port, options.host, function () {
@@ -16,7 +16,11 @@ function createAndStartDevServer (getApp, options) {
 }
 
 function createWebpackCompiler (config) {
-  config.entry['webpack_hm_client'] = 'webpack-hot-middleware/client?path=' + config.output.publicPath + '__webpack_hmr';
+  if (config.entry instanceof Object){
+    for(key in config.entry){
+      config.entry[key] = ['webpack-hot-middleware/client?path=' + config.output.publicPath + '__webpack_hmr'].concat(config.entry[key]);
+    }
+  }
   if (typeof config.plugins === 'undefined') config.plugins = []
   config.plugins.unshift(new webpack.HotModuleReplacementPlugin());
   return webpack(config)
@@ -75,3 +79,4 @@ exports.reloadApplication = reloadApplication
 exports.createWebpackCompiler = createWebpackCompiler
 exports.enableHotReload = enableHotReload
 exports.ignoreServerRecreated = ignoreServerRecreated
+
