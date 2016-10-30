@@ -63,7 +63,7 @@ function reloadApplication (serverCode, config, options) {
 //app will try to create server again - intercept EADDRINUSE error and ignore it, otherwise rethrow
 function ignoreServerRecreated (options) {
   process.on('uncaughtException', function (e) {
-    if (e.code !== 'EADDRINUSE' || e.syscall !== 'listen' || e.address != '127.0.0.1' || e.port !== options.port) {
+    if (e.code !== 'EADDRINUSE' || e.syscall !== 'listen' || e.address != '127.0.0.1' || e.port != options.port) {
       gutil.log('[gulp-reload]', e)
       throw e
     }
